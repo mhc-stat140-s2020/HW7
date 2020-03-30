@@ -1,0 +1,148 @@
+---
+title: 'STAT 140: Homework 7'
+author: "YOUR NAME HERE"
+date: "4/3/2020"
+output:
+  pdf_document: default
+  html_document: default
+subtitle: Sampling Distributions and Central Limit Theorem
+---
+
+## BOOK EXERCISES (OpenIntro Statistics, Fourth Edition)
+
+#### 5.1 Identify the parameter, Part I. For each of the following situations, state whether the parameter of interest is a mean or a proportion. It may be helpful to examine whether individual responses are numerical or categorical.
+
+#### (a) In a survey, one hundred college students are asked how many hours per week they spend on the internet.
+
+#### (b) In a survey, one hundred college students are asked: "What percentage of the time you spend on the internet is part of your course work?"
+
+#### (c) In a survey, one hundred college students are asked whether or not they cited information from Wikipedia in their papers.
+
+#### (d) In a survey, one hundred college students are asked what percentage of their weekly spending is on alcoholic beverages.
+
+#### (e) In a sample of one hundred recent graduates, it is found that 85 percent expect to get a job within one year of their graduation date.
+
+
+
+#### 5.3 Quility control. As part of a quality control process for computer chips, an engineer at a factory randomly samples 212 chips during a week of production to test the current rate of chips with severe defects. She fins that 27 of the chips are defective.
+
+#### (a) What population is under consideration in the data set?
+
+#### (b) What parameter is being estimated?
+ 
+#### (c) What is the point estimate for the parameter?
+
+#### (d) What is the name of the statistic we can use to measure the uncertainty of the point estimate?
+
+#### (e) Compute the value from part (d) for this context.
+ 
+#### (f) The historical rate of defects is 10%. Should the engineer be surprised by the observed rate of defects during the current week?
+
+#### (g) Suppose the true population value was found to be 10%. If we this proportion to recompute the value in part (e) using $p=0.1$ instead of $\hat{p}$, does the resulting value change much?
+
+
+
+#### 5.17) Online communication. A study suggests that 60% of college students spend 10 or more hours per week communicating with others online (obviously this study wasn't conducted during a global pandemic...). You believe that this is incorrect and decide to collect your own sample for a hypothesis test. You randomly sample 160 students from your dorm and find that 70% spent 10 or more hours a week communicating with others online. A friend of yours, who offers to help you with the hypothesis test, comes up with the following set of hypotheses. Indicate any errors you see.
+
+$$
+H_0: \hat{p} < 0.6
+$$
+$$
+H_A: \hat{p} > 0.7
+$$
+
+#### 5.19) Cyberbullying rates. Teens are surveyed about cyberbullying and 54% to 64% reported experiencing cyberbullying (95% confidence interval). Answer the following questions based on this interval.
+
+#### (a) A newspaper claims that a majority of teens have experienced cyberbullying. Is this claim supported by the confidence interval? Explain your reasoning.
+
+
+#### (b) A researcher conjectured that 70% of teens have experienced cyberbullying. Is this claim supported by the confidence interval? Explain your reasoning.
+
+
+
+
+#### 5.22) Getting enough sleep. 400 students were randomly sampled from a large university, and 289 said they did not get enough sleep. Conduct a hypothesis test to check whether this represents a statistically significant difference from 50%, and use a significance level of 0.01.
+
+
+
+
+## R EXERCISE
+
+In this exercise, we will explore confidence intervals for a proportion in the context of a simulation. The function below, CI_fcn, creates N confidence intervals for a proportion. 
+
+```{r CI_fcn}
+## Create function to create N confidence intervals
+## p is the population proportion (known because this is a simulation)
+## n is the sample size
+## z_star is our critical value (e.g. 1.96 for a 95% confidence interval)
+## N is the number of confidence intervals you want to make
+CI_fcn <- function(p, n, z_star, N){
+  CI_df <- data.frame(Sample=1:N,
+                      p_hat=rep(NA, N),
+                      lower.bound=rep(NA, N),
+                      upper.bound=rep(NA, N))
+  CI_df$p_hat <- rbinom(n=N, size=n, prob=p)/n
+  SE <- sqrt(CI_df$p_hat*(1-CI_df$p_hat)/n)
+  CI_df$lower.bound <- CI_df$p_hat-z_star*SE
+  CI_df$upper.bound <- CI_df$p_hat+z_star*SE
+  return(CI_df)
+}
+```
+
+Using the CI_fcn, make 100 95% confidence intervals. Assume that the true proportion of successes is 0.2 and that the sample size is 70. Name the object that you create CI_95.
+
+```{r}
+
+```
+
+
+Determine the proportion of your confidence intervals that contain the true proportion of successes.
+
+```{r}
+
+```
+
+
+How does this proportion compare to the confidence level for your interval (i.e. 95%)?
+
+ANSWER DOES NOT REQUIRE R CODE
+
+We can also plot the sample proportions and their corresponding confidence intervals. We will use ggplot for this with the data frame you generated using CI_fcn. Some example code is included but it currently commmented out. Edit it as needed to display your results from running CI_fcn.
+
+```{r visualize confidence intervals}
+library(ggplot2)
+
+# ggplot(CI_95, aes(x=Sample, y=p_hat)) + 
+#     geom_point() +
+#     geom_errorbar(aes(ymin=lower.bound, ymax=upper.bound), width=.1) +
+#     geom_hline(yintercept=TRUE PROPORTION, color="red")
+
+```
+
+
+
+
+
+## OPTIONAL "Challenge Problem"
+
+**Water contaminants.** A biologist is doing a survey of tap water in a certain area. In area A it is believed that the amount of a certain contaminant in one ounce of tap water follows a normal distribution with mean 1 microgram and standard deviation 0.3 micrograms. In area B, the amount of contaminant per ounce of tap water also follows a normal distribution with mean 1.3 micrograms and standard deviation 0.4 micrograms.
+
+The biologist takes a random sample of fifty one-ounce vials of tap water from Area A, and does the same thing for area B. They put the samples from area A in one box and the samples from area B in another box, and load them into the car. Unfortunately, however, they forget to label the boxes... (cue scary Halloween music here) 
+
+Back in the lab, the biologist picks up one of the boxes at random and decides to find the mean amount of contaminant in the 50 vials and use what they know about the contaminant distribution in Area A and in Area B to determine the probability that the box contains vials from Area B. **The researcher wants to know: given that the mean is found to be between 1.19 and 1.21 micrograms, what is the probability that the selected box is from Area B?** Let B stand for the event that Box B is selected. This will require Bayes' rule!
+
+1. To start the problem, find the following probabilities:
+
+a) $P(1.19\leq \bar{X}\leq 1.21|B)$
+
+b) $P(1.19\leq \bar{X}\leq 1.21|A)$
+
+c) $P(B)$
+
+d) $P(A)$
+
+2. Use Bayes' Rule and the probabilities calculated in (a)-(d) to find $P(B|1.19\leq \bar{X}\leq 1.21)$. 
+
+3. What box was likely picked up? Why?
+
+This problem was adapted from http://spots.gru.edu/nsmith12/R2210/Exercises_centrallimittheorem.pdf.
